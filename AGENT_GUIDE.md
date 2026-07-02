@@ -193,16 +193,26 @@ if (validation.ok) {
 ### Dry-run import (preview without saving)
 
 ```js
-// importData accepts both backup envelope AND raw PlannerDataV1
+// importData accepts the full export response, the backup envelope, or raw data
 const backup = window.Zeek.exportData({ format: 'backup' });
-const preview = window.Zeek.importData(backup.data, { dryRun: true });
+
+// You can pass the whole response:
+const preview = window.Zeek.importData(backup, { dryRun: true });
+
+// Or just the inner .data:
+const preview2 = window.Zeek.importData(backup.data, { dryRun: true });
+
 // preview.summary shows what would change
 ```
 
 ### Import/replace data
 
 ```js
-const result = window.Zeek.importData(backup.data, { mode: 'replace' });
+const backup = window.Zeek.exportData({ format: 'backup' });
+
+// Pass the whole response or just .data — both work
+const result = window.Zeek.importData(backup, { mode: 'replace' });
+
 // A pre-import snapshot is automatically saved for rollback
 ```
 
@@ -229,4 +239,5 @@ Always check `result.ok` before accessing `result.task`.
 5. **Someday vs dated**: `date: null` + `someday_column: N` for Someday; `date: "YYYY-MM-DD"` + `someday_column: null` for dated.
 6. **Weeks start on Monday** in the UI, but `recurrence_weekdays` uses `0=Sunday`.
 7. **No partial failures**: Either the entire mutation succeeds or it returns errors—no half-applied state.
-8. **`validateData()` vs `importData()`**: `validateData` expects raw `PlannerDataV1` (from `getData()` or `exportData({ format: 'raw' }).data`). `importData` accepts both backup envelopes and raw data.
+9. **`exportData()` response is self-importable**: You can pass the full `exportData()` result directly to `importData()` — it automatically unwraps the response wrapper. Passing just `result.data` also works.
+10. **`validateData()` vs `importData()`**: `validateData` expects raw `PlannerDataV1` (from `getData()` or `exportData({ format: 'raw' }).data`). `importData` accepts backup envelopes, raw data, and the full export response.

@@ -33,9 +33,10 @@ function toObject(input) {
 
 /**
  * Accept one of:
- *   1. a full ZeekBackupV1 envelope,
- *   2. a raw PlannerDataV1 object,
- *   3. (later) a legacy Laravel export shape — see adaptLegacyLaravel.
+ *   1. the response wrapper from exportData({ format: 'backup' }),
+ *   2. a full ZeekBackupV1 envelope,
+ *   3. a raw PlannerDataV1 object,
+ *   4. (later) a legacy Laravel export shape — see adaptLegacyLaravel.
  *
  * Returns `{ ok, data, source?, warnings }` or `{ ok: false, errors, raw }`.
  */
@@ -44,7 +45,14 @@ export function parseBackup(input) {
     if (!parsed.ok) {
         return { ok: false, errors: [{ message: parsed.error }] };
     }
-    const obj = parsed.value;
+    let obj = parsed.value;
+
+    // 0. Unwrap the exportData() response wrapper, if present.
+    //    exportData({ format: 'backup' }) returns { ok, format, data: { kind, ... } }
+    //    so we peel off the outer wrapper before matching schemas.
+    if (obj && typeof obj === 'object' && obj.ok === true && obj.format === 'backup' && obj.data) {
+        obj = obj.data;
+    }
 
     // 1. Backup envelope.
     const env = ZeekBackupV1.safeParse(obj);
