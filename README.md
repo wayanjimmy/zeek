@@ -37,6 +37,8 @@ A documented `window.Zeek` global is exposed after the app boots. It goes
 through the same Zod-validated store actions as the UI and returns JSON-safe
 clones; invalid input returns structured errors instead of partially mutating.
 
+**→ See [AGENT_GUIDE.md](AGENT_GUIDE.md) for the full agent-facing documentation.**
+
 ```js
 await window.Zeek.ready
 window.Zeek.help()                              // methods, invariants, versions

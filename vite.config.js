@@ -7,7 +7,7 @@ import { fileURLToPath, URL } from 'node:url';
 // Pure static client build. No server, no backend. The output in `dist/` can
 // be hosted on any static file server (or opened directly via file://).
 export default defineConfig(({ command }) => ({
-    base: './',
+    base: '/',
     plugins: [
         command === 'serve' &&
             vueDevTools({
