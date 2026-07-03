@@ -1,11 +1,18 @@
 # Zeek
 
-A local-first weekly planner. The app runs entirely in your browser after the
-assets load — there is **no server, no database, no auth**. All planner state
-lives in `localStorage`, and JSON backup/export is the official recovery
-mechanism.
+A local-first weekly planner inspired by [gogo-invoice](https://github.com/hallucinogen/gogo-invoice). The app runs entirely in your browser after the assets load — there is **no server, no database, no auth**. All planner state lives in `localStorage`, and JSON backup/export is the official recovery mechanism.
 
-## Run
+* **Hosted Web App:** [https://zeek-app.pages.dev/#/](https://zeek-app.pages.dev/#/)
+
+## Overview
+
+### Week View
+![Week View](public/week_view.png)
+
+### Task Details Popup
+![Task Details Popup](public/task_popup_view.png)
+
+## Run Locally
 
 ```bash
 deno task dev      # or: npm run dev   → vite dev server (default http://localhost:5173)
@@ -31,13 +38,19 @@ deno task build    # or: npm run build → static site in dist/ (host anywhere /
 export Markdown, run a dry-run import preview, replace data (with a pre-import
 snapshot), and recover from or discard quarantined corrupt payloads.
 
-## Agent API
+## Agent API & Integration
 
-A documented `window.Zeek` global is exposed after the app boots. It goes
-through the same Zod-validated store actions as the UI and returns JSON-safe
-clones; invalid input returns structured errors instead of partially mutating.
+A documented `window.Zeek` global is exposed after the app boots. It goes through the same Zod-validated store actions as the UI and returns JSON-safe clones; invalid input returns structured errors instead of partially mutating.
 
-**→ See [AGENT_GUIDE.md](AGENT_GUIDE.md) for the full agent-facing documentation.**
+* **Local Documentation:** [AGENT_GUIDE.md](AGENT_GUIDE.md)
+* **Public / Hosted Documentation:** [https://zeek-app.pages.dev/AGENT_GUIDE.md](https://zeek-app.pages.dev/AGENT_GUIDE.md)
+* **Recommended Headless Browser:** [Obscura](https://github.com/h4ckf0r0day/obscura) (lightweight, Rust-based headless browser engine for agent navigation)
+
+### Sample Prompt for AI Agents
+
+If you are using an AI coding assistant (like Claude, Gemini, etc.) and want to instruct it to interact with or manipulate your planner data programmatically via browser automation (e.g. Playwright/Puppeteer), you can use the following prompt:
+
+> "I want you to manage my weekly planner tasks at https://zeek-app.pages.dev/#/. Before taking any actions, please read and study the agent guide located at https://zeek-app.pages.dev/AGENT_GUIDE.md to understand the available `window.Zeek` API methods, schemas, and invariants. Once you have studied the guide, proceed to [describe your task here, e.g., list today's tasks or schedule a recurring meeting]."
 
 ```js
 await window.Zeek.ready
@@ -67,19 +80,4 @@ window.Zeek.delete(id)
   recreated. Editing a template disposes strictly-future instances and
   preserves past occurrences (and today's).
 
-## Layout
 
-```
-index.html          vite entry
-vite.config.js      static build (vue + tailwind, no server)
-src/
-  app.js            bootstrap: store boot + agent API + router + mount
-  App.vue           <RouterView/>
-  router/           hash-history router (/, /data)
-  store/            schema, storage, dates, recurrence, plannerStore, backup, agentApi, markdown
-  pages/            PlannerPage.vue, DataPage.vue
-  components/       planner UI (reused)
-  composables/      useClipboard
-  utils/            date helpers, week → markdown
-  css/app.css       tailwind entry + @source globs
-```
